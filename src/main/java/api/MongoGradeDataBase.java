@@ -247,10 +247,6 @@ public class MongoGradeDataBase implements GradeDataBase {
     }
 
     @Override
-    // TODO Task 3b: Implement this method
-    //       Hint: Read the Grade API documentation for getMyTeam (link below) and refer to the above similar
-    //             methods to help you write this code (copy-and-paste + edit as needed).
-    //             https://www.postman.com/cloudy-astronaut-813156/csc207-apis-2026/folder/jljgjb8/get-my-team
     public Team getMyTeam() {
         final OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
@@ -261,13 +257,28 @@ public class MongoGradeDataBase implements GradeDataBase {
                 .addHeader(CONTENT_TYPE, APPLICATION_JSON)
                 .build();
 
-        final Response response;
-        final JSONObject responseBody;
+        try {
+            final Response response = client.newCall(request).execute();
+            final JSONObject responseBody = new JSONObject(response.body().string());
 
-        // TODO Task 3b: Implement the logic to get the team information
-        // HINT 1: Look at the formTeam method to get an idea of how to parse the response
-        // HINT 2: You may find it useful to just initially print the contents of the JSON
-        //         then work on the details of how to parse it.
-        return null;
+            if (responseBody.getInt(STATUS_CODE) != SUCCESS_CODE) {
+                throw new RuntimeException(responseBody.getString(MESSAGE));
+            }
+
+            final JSONObject teamInfo = responseBody.getJSONObject("team");
+            final JSONArray teamMembers = teamInfo.getJSONArray("members");
+
+            final String name = teamInfo.getString("name");
+            final String[] members = new String[teamMembers.length()];
+
+            for (int i = 0; i < teamMembers.length(); i++) {
+                members[i] = teamMembers.getString(i);
+            }
+
+            return new Team(name, members);
+        }
+        catch (IOException | JSONException event) {
+            throw new RuntimeException(event);
+        }
     }
 }
