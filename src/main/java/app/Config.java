@@ -9,6 +9,7 @@ import usecase.GetTopGradeUseCase;
 import usecase.JoinTeamUseCase;
 import usecase.LeaveTeamUseCase;
 import usecase.LogGradeUseCase;
+import usecase.CommonCoursesUseCase;
 
 /**
  * Config class to provide use cases with the necessary dependencies.
@@ -73,5 +74,13 @@ public class Config {
 
     public GetTopGradeUseCase getTopGradeUseCase() {
         return new GetTopGradeUseCase(gradeDataBase);
+    }
+
+    /**
+     * Get the CommonCoursesUseCase object.
+     * @return CommonCoursesUseCase object.
+     */
+    public CommonCoursesUseCase commonCoursesUseCase() {
+        return new CommonCoursesUseCase(gradeDataBase);
     }
 }
