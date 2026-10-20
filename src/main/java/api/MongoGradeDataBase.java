@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import entity.Grade;
 import entity.Team;
+import entity.Team.TeamBuilder;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -267,15 +268,16 @@ public class MongoGradeDataBase implements GradeDataBase {
 
             final JSONObject teamInfo = responseBody.getJSONObject("team");
             final JSONArray teamMembers = teamInfo.getJSONArray("members");
-
-            final String name = teamInfo.getString("name");
             final String[] members = new String[teamMembers.length()];
 
             for (int i = 0; i < teamMembers.length(); i++) {
                 members[i] = teamMembers.getString(i);
             }
 
-            return new Team(name, members);
+            return Team.builder()
+                .name(responseBody.getString("name"))
+                .members(members)
+                .build();
         }
         catch (IOException | JSONException event) {
             throw new RuntimeException(event);
