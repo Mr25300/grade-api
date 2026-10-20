@@ -1,7 +1,10 @@
 package app;
 
+import api.AuthApi;
 import api.GradeDataBase;
 import api.MongoGradeDataBase;
+import api.TokenAuthApi;
+import entity.Session;
 import usecase.FormTeamUseCase;
 import usecase.GetAverageGradeUseCase;
 import usecase.GetGradeUseCase;
@@ -15,8 +18,8 @@ import usecase.LogGradeUseCase;
  */
 
 public class Config {
-    private final GradeDataBase gradeDataBase = new MongoGradeDataBase();
-
+    private final Session session = new Session();
+    private final GradeDataBase gradeDataBase = new MongoGradeDataBase(session);
     /**
      * Get the GetGradeUseCase object.
      *
@@ -73,5 +76,9 @@ public class Config {
 
     public GetTopGradeUseCase getTopGradeUseCase() {
         return new GetTopGradeUseCase(gradeDataBase);
+    }
+
+    public AuthApi getAuthApi() {
+        return new TokenAuthApi(session);
     }
 }

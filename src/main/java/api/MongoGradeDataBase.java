@@ -2,6 +2,7 @@ package api;
 
 import java.io.IOException;
 
+import entity.Session;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,10 +32,14 @@ public class MongoGradeDataBase implements GradeDataBase {
     private static final String COURSE = "course";
     private static final String USERNAME = "username";
     private static final int SUCCESS_CODE = 200;
+    private Session session;
 
+    public MongoGradeDataBase(Session session) {
+        this.session = session;
+    }
     // load token from env variable.
-    public static String getAPIToken() {
-        return System.getenv(TOKEN);
+    private String getAPIToken() {
+        return this.session.getToken();
     }
 
     @Override

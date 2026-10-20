@@ -16,6 +16,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import api.AuthApi;
+import entity.AuthRequest;
+import entity.UsernameAuthRequest;
 import org.json.JSONException;
 
 import api.MongoGradeDataBase;
@@ -51,6 +54,7 @@ public class Application {
         final LeaveTeamUseCase leaveTeamUseCase = config.leaveTeamUseCase();
         final GetAverageGradeUseCase getAverageGradeUseCase = config.getAverageGradeUseCase();
         final GetTopGradeUseCase getTopGradeUseCase = config.getTopGradeUseCase();
+        final AuthApi authApi = config.getAuthApi();
 
         // this is the code that runs to set up our GUI
         SwingUtilities.invokeLater(() -> {
@@ -67,6 +71,7 @@ public class Application {
             final JPanel formTeamCard = createFormTeamCard(frame, formTeamUseCase);
             final JPanel joinTeamCard = createJoinTeamCard(frame, joinTeamUseCase);
             final JPanel manageTeamCard = createManageTeamCard(frame, leaveTeamUseCase, getAverageGradeUseCase, getTopGradeUseCase);
+            final JPanel signUpCard = new Application().createSignUpCard(frame, authApi);
 
             cardPanel.add(defaultCard, "DefaultCard");
             cardPanel.add(getGradeCard, "GetGradeCard");
@@ -74,6 +79,7 @@ public class Application {
             cardPanel.add(formTeamCard, "FormTeamCard");
             cardPanel.add(joinTeamCard, "JoinTeamCard");
             cardPanel.add(manageTeamCard, "ManageTeamCard");
+            cardPanel.add(signUpCard, "SignUpCard");
 
             final JButton getGradeButton = new JButton("Get Grade");
             getGradeButton.addActionListener(new ActionListener() {
@@ -140,12 +146,21 @@ public class Application {
                 }
             });
 
+            final JButton signUpButton = new JButton("Sign Up");
+            signUpButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cardLayout.show(cardPanel, "SignUpCard");
+                }
+            });
+
             final JPanel buttonPanel = new JPanel();
             buttonPanel.add(getGradeButton);
             buttonPanel.add(logGradeButton);
             buttonPanel.add(formTeamButton);
             buttonPanel.add(joinTeamButton);
             buttonPanel.add(manageTeamButton);
+            buttonPanel.add(signUpButton);
 
             frame.getContentPane().add(cardPanel, BorderLayout.CENTER);
             frame.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
@@ -161,8 +176,7 @@ public class Application {
         final JPanel defaultCard = new JPanel();
         defaultCard.setLayout(new GridBagLayout());
 
-        final JLabel infoLabel = new JLabel(String.format("<html>Welcome to the Grade App!<br><br>"
-                + "Your api_token is:<br><br>%s</html>", MongoGradeDataBase.getAPIToken()));
+        final JLabel infoLabel = new JLabel("<html>Welcome to the Grade App!<br><br>");
 
         defaultCard.add(infoLabel);
 
@@ -388,6 +402,7 @@ public class Application {
             }
         });
 
+
         theCard.add(new JLabel("The course you want to calculate the team average for:"));
         theCard.add(courseField);
         theCard.add(getAverageButton);
@@ -396,5 +411,38 @@ public class Application {
         theCard.add(resultLabel);
         return theCard;
 
+    }
+    private JPanel createSignUpCard(JFrame jFrame, AuthApi authApi) {
+        final JPanel theCard = new JPanel();
+        theCard.setLayout(new GridLayout(ROWS, COLS));
+        final JTextField nameField = new JTextField(20);
+        final JButton loginButton = new JButton("Log in");
+        final JLabel resultLabel = new JLabel();
+
+        loginButton.addActionListener(new ActionListener() {
+            /**
+             * Invoked when an action occurs.
+             *
+             * @param e the event to be processed
+             */
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final String username = nameField.getText();
+                final AuthRequest authRequest = new UsernameAuthRequest(username);
+                try {
+                    authApi.authorize(authRequest);
+                    JOptionPane.showMessageDialog(jFrame, "Logged in successfully");
+                    nameField.setText("");
+                }
+                catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(jFrame, ex.getMessage());
+                }
+            }
+        });
+        theCard.add(new JLabel("Your username:"));
+        theCard.add(nameField);
+        theCard.add(loginButton);
+        theCard.add(resultLabel);
+        return theCard;
     }
 }
