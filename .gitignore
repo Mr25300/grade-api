@@ -40,3 +40,5 @@ build/
 
 ### Our API TOKEN! ###
 token.txt
+
+.env
