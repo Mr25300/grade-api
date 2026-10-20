@@ -395,8 +395,7 @@ public class Application {
                     courseField.setText("");
                 }
                 catch (RuntimeException ex) {
-                    // JOptionPane.showMessageDialog(jFrame, ex.getMessage());
-                    throw ex;
+                    JOptionPane.showMessageDialog(jFrame, ex.getMessage());
                 }
             }
         });
